@@ -17,3 +17,8 @@ app.get('/pet', function(request, response){
 app.get('/beauty', function(request, response){
     response.send('뷰티용품을 쇼핑할 수 있는 페이지입니다.')
 });
+
+// 홈으로 누가 접속했을 때 해당 파일을 보내주세요
+app.get('/', function(request, response){ 
+    response.sendFile(__dirname + '/index.html')
+});
