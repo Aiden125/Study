@@ -63,25 +63,7 @@ app.get('/write', function(request, response){
 // 데이터 2개(날짜, 제목)를 보내주는데,
 // 이 때 'post'라는 이름을 가진 collection에 두개 데이터 저장
 // { 제목 : '어쩌구', 날짜 : '어쩌구 }
-app.post('/add', function(request, response){
-    response.send('전송완료');
-    db.collection('counter').findOne({name : "게시물 글 갯수"}, function(error, result){
-        console.log(result.totalPost)
-        var totalPost = result.totalPost;
-        
-        db.collection('post').insertOne( { _id : totalPost + 1, 제목 : request.body.title, 날짜 : request.body.date} , function(에러, 결과){
-            console.log('저장완료');
 
-            // counter에 있는 totalPost +1 시키기
-            // 콜백함수를 에러검증 용도로 쓰는 방법
-            db.collection('counter').updateOne({name:'게시물 글 갯수'},{ $inc : {totalPost:1} },function(error, result){
-                if(error) {return console.log(error)}
-            });
-        });
-
-        
-    });
-});
 
 
 
@@ -101,29 +83,29 @@ app.get('/list', function(request, response){
 
 //  검색
 app.get('/search', (request, response) => {
+    var 검색조건 = [
+        {
+            $search: {
+                index: 'titleSearch',
+                text: {
+                    query: request.query.value,
+                    path: "제목" // 여러개 원하면 ['제목', '날짜']
+                }
+            }
+        },
+        // score는 검색의 점수이고 이 순서대로 정렬해줌, 1로 입력한 값은 보여주고 0인 값은 안보여줌
+        // { $project : { 제목 : 1, _id: 0, score : { $meta: "searchScore" } } }
+
+        // { $sort : { _id : 1 } }, // 결과 정렬하기
+        // { $limit : 10 } // 10개만 가져와
+    ]
     console.log(request.query.value); // 요청 파라미터 잡아주는것 key를 잡아주는 거라고 생각하면 됨
-    db.collection('post').find({제목:request.query.value}).toArray((error, result)=>{
+    db.collection('post').aggregate(검색조건).toArray((error, result)=>{
         console.log(result)
         response.render('search.ejs', {posts : result} )
     })
 })
 
-
-
-
-
-// 삭제 요청 응답하기
-app.delete('/delete', function(request, response){
-    console.log(request.body);
-    // 파라미터로 날라온건 String이기에 int로 바꿔주자
-    request.body._id = parseInt(request.body._id);
-    
-    // request.body에 담겨온 게시물 번호를 가진 글을 db에서 찾아서 삭제해줘
-    db.collection('post').deleteOne(request.body, function(error, result){
-        console.log('삭제완료');
-        response.status(200).send({ message : '성공' }); // .send를 넣으면 메시지를 보내줌
-    })
-})
 
 
 // 상세보기 요청 응답하기
@@ -232,10 +214,63 @@ passport.use(new LocalStrategy({
 
 
 
+// 가입하기
+// 부가적으로 넣어야 할 기능 +중복검사+정규식+비번암호화
+app.post('/register', function(request, response){
+    db.collection('login').insertOne( { id : request.body.id, pw : request.body.pw }, function(error, result){
+        response.redirect('/')
+    })
+})
+
+
+app.post('/add', function(request, response){
+
+
+    response.send('전송완료');
+    db.collection('counter').findOne({name : "게시물 글 갯수"}, function(error, result){
+        console.log(result.totalPost)
+        var totalPost = result.totalPost;
+        var 저장할거 = { _id : totalPost + 1, 작성자 : request.user._id, 제목 : request.body.title, 날짜 : request.body.date }
+        
+        db.collection('post').insertOne(저장할거, function(에러, 결과){
+            console.log('저장완료');
+
+            // counter에 있는 totalPost +1 시키기
+            // 콜백함수를 에러검증 용도로 쓰는 방법
+            db.collection('counter').updateOne({name:'게시물 글 갯수'},{ $inc : {totalPost:1} },function(error, result){
+                if(error) {return console.log(error)}
+            });
+        });
+
+        
+    });
+});
+
+
+// 삭제 요청 응답하기
+app.delete('/delete', function(request, response){
+    console.log(request.body);
+    // 파라미터로 날라온건 String이기에 int로 바꿔주자
+    request.body._id = parseInt(request.body._id);
+    
+    var 삭제할데이터 = { _id : request.body._id, 작성자 : request.user._id }
+
+    // request.body에 담겨온 게시물 번호를 가진 글을 db에서 찾아서 삭제해줘
+    db.collection('post').deleteOne(삭제할데이터, function(error, result){
+        console.log('삭제완료');
+        if(error) {console.log(error)}
+        response.status(200).send({ message : '성공' }); // .send를 넣으면 메시지를 보내줌
+    })
+})
 
 
 
+// 미들웨어를 app.use 가 아닌 특정 요청과 응답 사이에 구겨넣는 것도 가능
+// 슬래시shop 경로로 접속을 했을 때 이런 미들웨어를 적용하겠다(app.use)
+// /shop으로 공통경로를 잡는 개념이라고 보면 됨
+app.use('/shop', require('./routes/shop.js')); // ./가 현재 경로를 뜻함
 
+app.use('/board/sub', require('./routes/board.js')); // ./가 현재 경로를 뜻함
 
 
 
