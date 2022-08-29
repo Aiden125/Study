@@ -7,6 +7,8 @@ const { response, request } = require('express');
 app.use(bodyParser.urlencoded({extended : true}));
 const MongoClient = require('mongodb').MongoClient;
 
+require('dotenv').config() // 환경변수를 위한 라이브러리
+
 // method-override를 위한 과정
 const methodOverride = require('method-override')
 app.use(methodOverride('_method'))
@@ -19,7 +21,7 @@ app.use('/public', express.static('public'));
 
 
 var db;
-MongoClient.connect('mongodb+srv://admin:user1234@cluster0.n6syaoe.mongodb.net/?retryWrites=true&w=majority', { useUnifiedTopology: true }, function(에러, client){ // DB 커넥팅이 완료되면 서버 띄워
+MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(에러, client){ // DB 커넥팅이 완료되면 서버 띄워
     if(에러) return console.log(에러) // 에러 뜨면 원인 콘솔에 띄우기
 
     db = client.db('todoapp'); // todoapp이라는 폴더(database)에 연결해
@@ -97,6 +99,18 @@ app.get('/list', function(request, response){
     
 });
 
+//  검색
+app.get('/search', (request, response) => {
+    console.log(request.query.value); // 요청 파라미터 잡아주는것 key를 잡아주는 거라고 생각하면 됨
+    db.collection('post').find({제목:request.query.value}).toArray((error, result)=>{
+        console.log(result)
+        response.render('search.ejs', {posts : result} )
+    })
+})
+
+
+
+
 
 // 삭제 요청 응답하기
 app.delete('/delete', function(request, response){
@@ -142,4 +156,86 @@ app.put('/edit', function(request, response){
         response.redirect('/list')
     })
 });
+
+
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
+
+// app.use = 미들웨어를 쓰겠다
+// 미들웨어 = 요청-응답 중간에 뭔가 실행되는 코드
+app.use(session({secret : '비밀코드', resave : true, saveUninitialized: false}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// 로그인 페이지 라우팅
+app.get('/login', function(request, response){
+    response.render('login.ejs')
+});
+
+app.post('/login', passport.authenticate('local', { // 로컬인지 확인해줘
+    failureRedirect : '/fail' // 인증 실패하면 여기로 이동해줘
+}), function(request, response){ // 성공한 경우 실행
+    response.redirect('/')
+});
+
+
+app.get('/mypage', 로그인했니, function(request, response){ // 로그인 했니라는 미들웨어 적용
+    console.log(request.user);
+    response.render('mypage.ejs', {사용자 : request.user}) // 성공하면 여기로 보내기
+});
+
+function 로그인했니(request ,response, next){ // 적용할 미들웨어
+    if(request.user){ // 이사람이 로그인한 상대명 request.user가 달라붙어 있다
+        next()
+    }else{
+        response.send('로그인이 안되어있습니다')
+    }
+}
+
+
+// passport를 활용한 인증
+// 인증방식을 Local Strategy 라고 칭함
+// 아이디랑 비번을 입력하면 이를 정의
+passport.use(new LocalStrategy({
+    usernameField: 'id', // 아이디의 네임
+    passwordField: 'pw', // 비번의 네임
+    session: true, // 세션으로 저장할건지
+    passReqToCallback: false,
+  }, function (입력한아이디, 입력한비번, done) {
+    //console.log(입력한아이디, 입력한비번);
+    db.collection('login').findOne({ id: 입력한아이디 }, function (에러, 결과) { // 디비에 입력 데이터가 있는지 찾기
+      if (에러) return done(에러) // 에러처리
+  
+      if (!결과) return done(null, false, { message: '존재하지않는 아이디요' }) // 디비에 아이디가 없는 경우
+      if (입력한비번 == 결과.pw) { // 비번까지 맞는 경우
+        return done(null, 결과)
+      } else { // 비번이 틀린 경우
+        return done(null, false, { message: '비번틀렸어요' })
+      }
+    })
+  }));
+
+  
+  // 세션을 저장시키는 코드(로그인 성공시 발동)
+  passport.serializeUser(function(user, done){
+    done(null, user.id) // user.id라는 걸로 세션을 만든다
+  });
+  // 이 세션 데이터를 가진 사람을 DB에서 찾아줘(마이페이지 접속 시 발동)
+  passport.deserializeUser(function(아이디, done){ // 여기서 아이디는 위의 user.id
+    // 디비에서 위에있는 user.id로 유저를 찾은 뒤 유저정보를 아래에 뱉어 넣음
+    db.collection('login').findOne({id : 아이디}, function(error, result){
+        done(null, result)
+    })
+  });
+
+
+
+
+
+
+
+
+
 
