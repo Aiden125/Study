@@ -313,7 +313,20 @@ app.get('/image/:imageName', function(request, response){
 // <img src="/image/music.jpg">
 
 
+// 채팅시작하기
+app.post('/chatroom', 로그인했니, function(request, response){
+    response.send('채팅방만들기 성공')
 
+    var 저장할거 = { 
+        title : "채팅방",
+        member : [request.body.당한사람id, request.user._id],
+        date : new Date()
+    }
+    
+    db.collection('chatroom').insertOne(저장할거).then((result)=> {
+        console.log('저장완료');
+    })
+})
 
 
 
