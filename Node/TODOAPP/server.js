@@ -274,3 +274,52 @@ app.use('/board/sub', require('./routes/board.js')); // ./가 현재 경로를 �
 
 
 
+
+// 파일 저장
+let multer = require('multer');
+var storage = multer.diskStorage({ // diskStorage = 같은 폴더에 저장해주세요
+    destination : function(req, file, cb){
+        cb(null, './public/image')
+    },
+    filename : function(req, file, cb){
+        cb(null, file.originalname) // 기본 파일로 저장해줘
+    }
+});
+
+var upload = multer({storage : storage}); // 포스트 요청시 이걸 소환하면 multer가 알아서 함
+
+
+// 파일 업로드 페이지
+app.get('/upload', function(request, response){
+    response.render('upload.ejs')
+})
+
+// 파일 업로드 요청
+app.post('/upload', upload.single('profile'), function(request, response){
+    response.send('업로드완료')
+});
+
+// 파일 여러개 업로드 요청
+// app.post('/upload', upload.array('profile', 10), function(request, response){
+//     response.send('업로드완료')
+// });
+
+
+// /image/music.jpg 라고 하면 music.jpg 보내줘야함
+app.get('/image/:imageName', function(request, response){
+    response.sendFile( __dirname + '/public/image/' + request.params.imageName ) // dirname = 현재 파일의 경로
+})
+
+// <img src="/image/music.jpg">
+
+
+
+
+
+
+
+
+
+
+
+
