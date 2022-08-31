@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const { response, request } = require('express');
 app.use(bodyParser.urlencoded({extended : true}));
 const MongoClient = require('mongodb').MongoClient;
+const { ObjectId } = require('mongodb'); // objectId 쓰기위함
 
 require('dotenv').config() // 환경변수를 위한 라이브러리
 
@@ -315,24 +316,61 @@ app.get('/image/:imageName', function(request, response){
 
 // 채팅시작하기
 app.post('/chatroom', 로그인했니, function(request, response){
-    response.send('채팅방만들기 성공')
-
     var 저장할거 = { 
         title : "채팅방",
-        member : [request.body.당한사람id, request.user._id],
+        member : [ObjectId(request.body.당한사람id), request.user._id], // 게시글에 저장된 id, session에 부여된 아이디 받기
         date : new Date()
     }
     
     db.collection('chatroom').insertOne(저장할거).then((result)=> {
-        console.log('저장완료');
+        console.log('성공')
     })
 })
 
 
+// 내 채팅보기 페이지
+app.get('/chat', 로그인했니, function(request, response){
+
+    db.collection('chatroom').find({ member : request.user._id }).toArray().then((result)=>{ // Array안에 있어도 이렇게 찾기 가능 특정 멤버의 모든 자료를 꺼내줌
+        response.render('chat.ejs', { data : result } )
+    })
+})
+
+// 메시지 발행
+app.post('/message', 로그인했니, function(request, response){
+    
+    var 저장할거 = {
+        parent : request.body.parent,
+        content : request.body.content,
+        userid : request.user._id,
+        date : new Date()
+    }
 
 
+    db.collection('message').insertOne(저장할거).then(()=>{
+        console.log('성공')
+        response.send('DB저장성공')
+    })
+});
 
 
+// 채팅 구현하기
+app.get('/message/:id', 로그인했니, function(request, response){
+    
+    response.writeHead(200, {
+        "Connection": "keep-alive",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+    });
+
+    db.collection('message').find({ parent : request.params.id }).toArray().then((result)=>{
+        response.write('event: test\n'); // event 보낼데이터 이름
+        // 서버 데이터는 문자로만 온다.
+        response.write('data: ' + JSON.stringify(result) + '\n\n'); // data 보낼데이터, {} 안에 담겨오기에 {}벗기기
+    })
+
+
+});
 
 
 
