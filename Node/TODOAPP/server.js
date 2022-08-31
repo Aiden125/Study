@@ -8,6 +8,11 @@ app.use(bodyParser.urlencoded({extended : true}));
 const MongoClient = require('mongodb').MongoClient;
 const { ObjectId } = require('mongodb'); // objectId 쓰기위함
 
+// socket.io 셋팅
+const http = require('http').createServer(app);
+const {Server} = require('socket.io');
+const io = new Server(http);
+
 require('dotenv').config() // 환경변수를 위한 라이브러리
 
 // method-override를 위한 과정
@@ -31,7 +36,7 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(�
     //     console.log('저장완료');
     // });
 
-    app.listen(8081, function(){
+    http.listen(8081, function(){
         console.log('listening on 8081')
     }); // 서버를 열 수 있는데 어디로 열지(서버포트, 뭐할지)
 
@@ -365,12 +370,62 @@ app.get('/message/:id', 로그인했니, function(request, response){
 
     db.collection('message').find({ parent : request.params.id }).toArray().then((result)=>{
         response.write('event: test\n'); // event 보낼데이터 이름
-        // 서버 데이터는 문자로만 온다.
+        // 서버 데이터는 문자로만 온다. 
         response.write('data: ' + JSON.stringify(result) + '\n\n'); // data 보낼데이터, {} 안에 담겨오기에 {}벗기기
     })
+
+
+    // change Stream 설정 message 컬렉션을 감시해라
+    const pipeline = [ // 유저가 요청한 것만 감시해라
+        { $match: { 'fullDocument.parent' : request.params.id } }
+    ];
+    const collection = db.collection('message');
+    const changeStream = collection.watch(pipeline);
+    changeStream.on('change', (result)=>{
+        console.log(result.fullDocument) // fullDocument == 변경된것만
+        response.write('event: test\n'); // event 보낼데이터 이름
+        response.write('data: ' + JSON.stringify([result.fullDocument]) + '\n\n');
+    });
 
 
 });
 
 
 
+app.get('/socket', function(request, response){
+    response.render('socket.ejs')
+})
+
+// 누가 웹소켓에 접속하면 내부 코드 실행해줘
+io.on('connection', function(socket){
+    console.log('유저 접속됨')
+    
+    // 채팅방 만들고 유저 넣기
+    socket.on('room1-send', function(data){
+        io.to('room1').emit('broadcast', data)
+    });
+
+
+    // 채팅방 만들고 유저 넣기
+    socket.on('joinroom', function(data){
+        socket.join('room1');
+    });
+
+
+    // 누가 user-send 이름으로 메시지 보내면 내부 코드 실행해
+    socket.on('user-send', function(data){
+        console.log('유저접속됨');
+        
+        // 서버가 유저에게 메시지 보내기
+        // io.emit('broadcast', data) // 소켓에 참여한 모든 유저에게 보냄(단톡)
+        // console.log(data);
+        io.to(socket.id).emit('broadcast', data) // 서버 - 유저 1명간 단독 소통
+    });
+
+});
+
+
+// 잘못된 페이지로 접근 했을 때 처리하기(최하단에 해야함)
+app.get('*', function(request, response){
+    response.render('index.ejs');
+})

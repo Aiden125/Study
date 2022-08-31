@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/public/main.css">
+    
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    
+    <%- include('nav.html') %>
+
+    <div>채팅방</div>
+    <input id="input1">
+    <div id="content"></div>
+    <button id="send">서버에게 메시지 보내기</button>
+    <button id="room1">채팅방1 입장</button>
+    <button id="room1-send">채팅방1에 메시지 보내기</button>
+    
+
+    <script>
+        var socket = io();
+
+        $('#room1-send').click(function(){
+            socket.emit('room1-send', '반가워 채팅방1 사람들아')
+        })
+
+        // 채팅방에 입장시키기
+        // 소켓을 쓸 때는 get/post를 socket으로 대체가능
+        $('#room1').click(function(){
+            socket.emit('joinroom', '채팅방 입잡시켜줘')
+        })
+
+        // 서버에게 실시간 메시지 보내기
+        $('#send').click(function(){
+            socket.emit('user-send', $('#input1').val() )// 어떤 이름으로 보낼지, 어떤걸 보낼지
+        });
+
+        // 유저가 서버 메시지 받기(서버가 broadcast라는걸로 메시지 보내면 아래 실행해줘)
+        socket.on('broadcast', function(data){
+            // console.log(data)
+            $('#content').append('<div>' + data + '</div>')
+        });
+
+    </script>
+
+
+    
+    
+
+
+    
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+  </body>
+</html>
