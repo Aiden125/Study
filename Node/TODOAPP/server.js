@@ -36,8 +36,8 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(�
     //     console.log('저장완료');
     // });
 
-    http.listen(8081, function(){
-        console.log('listening on 8081')
+    http.listen(8080, function(){
+        console.log('listening on 8080')
     }); // 서버를 열 수 있는데 어디로 열지(서버포트, 뭐할지)
 
 });
