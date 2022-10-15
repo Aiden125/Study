@@ -5,6 +5,7 @@ import hello.hellospring.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +24,7 @@ class MemberServiceIntegrationTest {
     void 회원가입() {
         //given : 이게 주어졌고(필요한 것들)
         Member member = new Member();
-        member.setName("spring");
+        member.setName("spring10");
 
         //when : 이걸 실행 했을 때(실행하는 것들)
         Long saveId = memberService.join(member);
