@@ -1,0 +1,11 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hello</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<!-- 아래처럼 할 경우 서버 사이드 렌더링 되면 th꺼로, 정적페이지로 보는 경우 그 바깥에 껄로 보여줌 -->
+<p th:text="'안녕 ' + ${data}" >안녕하세요 손님</p>
+</body>
+</html>
