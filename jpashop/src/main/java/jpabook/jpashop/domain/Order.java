@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.FetchType.*;
+
 @Entity
 @Table(name = "orders") // 테이블 이름을 적어줘야함
 @Getter @Setter
@@ -17,14 +19,15 @@ public class Order {
     @Column(name = "order_id") // 컬럼 이름 직접 지정해주기
     private Long id;
 
-    @ManyToOne // 매우 중요한 부분 orders 테이블 기준 member를 보면 manytoone이기 때문에
+    @ManyToOne(fetch = LAZY) // 매우 중요한 부분 orders 테이블 기준 member를 보면 manytoone이기 때문에
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "order_id") // mappedBy는 해당 컬럼에 의해 매핑되었다는 표시
+    // mappedBy는 해당 컬럼에 의해 매핑되었다는 표시
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 

@@ -20,7 +20,7 @@ public class Member {
     @Embedded
     private Address address;
 
-    @OneToMany(mappedBy = "member_id") // mappedBy는 어떤 컬럼에 의해서 연관관계가 되었는가? 를 적는것
+    @OneToMany(mappedBy = "member") // mappedBy는 어떤 컬럼에 의해서 연관관계가 되었는가? 를 적는것
     private List<Order> orders = new ArrayList<>();
 
 
