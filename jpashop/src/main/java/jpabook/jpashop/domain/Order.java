@@ -1,6 +1,8 @@
 package jpabook.jpashop.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -14,6 +16,7 @@ import static javax.persistence.FetchType.*;
 @Table(name = "orders") // 테이블 이름을 적어줘야함
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 다른데서 new, set 못하게
 public class Order {
 
     @Id
