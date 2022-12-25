@@ -16,6 +16,7 @@ public class MemberRepository {
 
     private final EntityManager em;
 
+
     // "a 시작"
 //    @Autowired
 //    public MemberRepository(EntityManager em) {
