@@ -1,6 +1,8 @@
 package jpabook.jpashop.repository;
 
+import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
+import jpabook.jpashop.domain.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -73,5 +75,37 @@ public class OrderRepository {
         TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000);
         return query.getResultList();
     }
+
+
+    /**
+     * Querydsl로 처리하는 방법(가장 추천)
+     */
+//    public List<Order> findAll(OrderSearch orderSearch) {
+//
+//        Order order = Order.order;
+//        Member member = Member.member;
+//
+//        return query
+//                .select(order)
+//                .from(order)
+//                .join(order.member, member)
+//                .where(statusEq(orderSearch.getOrderStatus()),
+//                        nameLike(orderSearch.getMemberName()))
+//                .limit(1000)
+//                .fetch();
+//    }
+//
+//    private Object nameLike(String nameCond) {
+//        if (!StringUtils.hasText(nameCond)) {
+//            return null;
+//        }
+//    }
+//
+//    private BooleanExpression statusEq(OrderStatus statusCond) {
+//        if (statusCond == null) {
+//            return null;
+//        }
+//        return order.status.eq(statusCond);
+//    }
 
 }
