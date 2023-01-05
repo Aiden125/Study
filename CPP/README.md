@@ -43,7 +43,41 @@ d : int / c : char / s : string / lf : double / ld : long long
 ## precision
 precision(7) 소수 7번째 자리에서 반올림하라
 
-## 자주 등장하는 타입 8가지
+## 자주 등장하는 타입 7가지
 ```C++
-void, char, string, bool, int, long long, double, unsigned, long
+void, char, string, bool, int, long long, double
 ```
+- void : 리턴하는 값이 x
+- char : 1바이트 문자
+- string : 문자열(영어, 숫자1바이트, 한글 3바이트)
+- bool : 0이면 false, 0이 아니면 모두 true
+- int : 4바이트, 대략20억까지, const int INF2 = le0;
+- long long : 8바이트, 숫자 제한이 없다봐도 무방, ll INF = 1e18;
+- double : 실수, 8바이트, 소수점 아래 15까지(float은 7자리까지)
+
+## string method
+- a.pop_back() : 맨 뒤 하나 지우기
+- a.begin() : 포인터가 맨앞을 가리킴
+- a.end() : 포인터가 맨뒤를 가리킴(마지막 글자원하면 -1 해주기)
+- a.size() : a문자열의 사이즈
+- a.fine("love") : love라는 문자가 있으면 string::npos 반환
+- a.substr(5,2) : 5번째 위치부터 2칸 추출
+- 아스키코드 : A(65), a(97)
+- reverse() : 문자열 뒤집기
+- split() : C++은 split을 직접만들어서 써야하며 코드 꼭 기억하기
+```C++
+while ((pos = input.find(delimiter)) != string::npos) {
+token = input.substr(0, pos);
+ret.push_back(token);
+input.erase(0, pos + delimiter.length());
+}
+ret.push_back(input);
+return ret;
+```
+- atoi(s.c_str) : s가 문자열이면 0반환 그게 아니면 숫자 반환
+
+## 오버플로 언더플로
+- 오버플로 : 타입의 허용범위 넘어갈 때 발생하는 에러
+- 언더플로 : 타입의 허용범위 아래로 내려갈 때 발생하는 에러
+
+44페이지부터 시작
