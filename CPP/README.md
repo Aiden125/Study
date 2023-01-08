@@ -80,4 +80,39 @@ return ret;
 - 오버플로 : 타입의 허용범위 넘어갈 때 발생하는 에러
 - 언더플로 : 타입의 허용범위 아래로 내려갈 때 발생하는 에러
 
-59페이지부터 시작
+
+## auto
+타입추론을 해서 결정되는 타입. 특별히 어떤 타입이라고 지정하는 것이 아닌 유추 할 수 있게 만들어주는 타입
+
+## 역참조 연산자
+'*'를 에스터리스크(asterisk operator)라고 부르며, 이를 포인터 타입 선언, 역참조, 곱셉 연산 등으로 활용 가능
+```C++
+#include<bits/stdc++.h>
+using namespace std;
+int main(){
+string a = "abcda";
+string * b = &a;
+cout << b << "\n";
+cout << *b << "\n";
+return 0;
+/*
+0x6ffdf0
+abcda
+*/
+}
+
+```
+
+## 이터레이터
+컨테이너에 저장되어 있는 요소의 주소를 가리키는 객체이며, begin(), end(), advance(iterator, cnt)와 자주 쓰임
+- begin() : 컨테이너의 시작 위치 반환
+- end() : 컨테이너의 끝 다음 위치 반환
+- advance(iterator, cnt) : 해당 iterator를 cnt까지 증가
+
+
+## sort
+정렬인데 그냥 sort하거나 less<int>() 를 이용해서 오름차순으로,
+greater<int>()를 사용해서 내림차순으로 정렬 가능하다. 
+
+<br><br>
+64페이지부터 시작 
