@@ -1,0 +1,11 @@
+{
+    "name" : "npmtest-6621",
+    "version" : "0.0.1",
+    "description" : "hello package.json",
+    "main" : "index.js",
+    "scripts" : {
+        "test" : "echo \"Error: no test specifed\" && exit 1"
+    },
+    "author" : "moan125",
+    "license" : "MIT"
+}
