@@ -1,24 +1,28 @@
 /** express를 활용해 http 서버를 만든다 */
 const express = require('express');
 const path = require('path');
+const morgan = require('morgan');
+
 const app = express();
 
 app.set('port', process.env.PORT || 3000);
 
+app.use(morgan('dev'));
+
 /** 미들웨어 부분인데 app.use가 미들웨어가 아닌
  * req, res, next 들어가는 이 함수 자체가 미들웨어임
  */
-app.use((req, res, next) => {
-    console.log("1 모든 요청에 실행하고 싶어요");
-    next();
-}, (req, res, next) => {
-    try {
-        console.log('에러야');
-    } catch (error) {
-        // 이렇게 next에 error를 넣으면 에러처리로 바로 감
-        next(error);
-    }
-})
+// app.use((req, res, next) => {
+//     console.log("1 모든 요청에 실행하고 싶어요");
+//     next();
+// }, (req, res, next) => {
+//     try {
+//         console.log('에러야');
+//     } catch (error) {
+//         // 이렇게 next에 error를 넣으면 에러처리로 바로 감
+//         next(error);
+//     }
+// })
 // , (req, res, next) => {
 //     console.log("2 모든 요청에 실행하고 싶어요");
 //     next();
