@@ -2,12 +2,17 @@
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 app.set('port', process.env.PORT || 3000);
 
+// app.use(morgan('combined'));
 app.use(morgan('dev'));
+app.use(cookieParser('moon'));
+app.use(express.json()); // json data 받을 때
+app.use(express.urlencoded({ extended: true })); // form data 받을 때. true면 qs, false면 querystring
 
 /** 미들웨어 부분인데 app.use가 미들웨어가 아닌
  * req, res, next 들어가는 이 함수 자체가 미들웨어임
@@ -36,9 +41,20 @@ app.use(morgan('dev'));
  *  한 라우터에서 send, json 등을 두 번 이상 하면 오류난다.
 */
 app.get('/', (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-    // res.sendFile(path.join(__dirname, 'index.html'));
-    res.send('안녕'); // 이것들까지 쓰면 에러 발생
+    req.cookies
+    req.signedCookies;
+    res.cookie('name', encodeURIComponent(name), {
+        expires: new Date(),
+        httpOnly: true,
+        path: '/',
+    })
+    res.clearCookie('name', encodeURIComponent(name), {
+        httpOnly: true,
+        path: '/',
+    })
+    res.sendFile(path.join(__dirname, 'index.html'));
+    // res.setHeader('Content-Type', 'text/html');
+    // res.send('안녕'); // 이것들까지 쓰면 에러 발생
     // res.json({ hello: 'moon' });
 });
 
