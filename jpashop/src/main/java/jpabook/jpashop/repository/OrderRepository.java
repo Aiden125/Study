@@ -50,7 +50,8 @@ public class OrderRepository {
      * (실무에선 안쓰는 방법이지만 이런게 있구나 정도)
      * (유지보수성이 매우 낮음)
      */
-    public List<Order> findAllByCriteria(OrderSearch orderSearch) {
+    /**
+    public List<Ord/*er> findAllByCriteria(OrderSearch orderSearch) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Order> cq = cb.createQuery(Order.class);
         Root<Order> o = cq.from(Order.class);
@@ -75,37 +76,38 @@ public class OrderRepository {
         TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000);
         return query.getResultList();
     }
+     */
 
 
     /**
      * Querydsl로 처리하는 방법(가장 추천)
      */
-//    public List<Order> findAll(OrderSearch orderSearch) {
-//
-//        Order order = Order.order;
-//        Member member = Member.member;
-//
-//        return query
-//                .select(order)
-//                .from(order)
-//                .join(order.member, member)
-//                .where(statusEq(orderSearch.getOrderStatus()),
-//                        nameLike(orderSearch.getMemberName()))
-//                .limit(1000)
-//                .fetch();
-//    }
-//
-//    private Object nameLike(String nameCond) {
-//        if (!StringUtils.hasText(nameCond)) {
-//            return null;
-//        }
-//    }
-//
-//    private BooleanExpression statusEq(OrderStatus statusCond) {
-//        if (statusCond == null) {
-//            return null;
-//        }
-//        return order.status.eq(statusCond);
-//    }
+    public List<Order> findAll(OrderSearch orderSearch) {
+
+        Order order = Order.order;
+        Member member = Member.member;
+
+        return query
+                .select(order)
+                .from(order)
+                .join(order.member, member)
+                .where(statusEq(orderSearch.getOrderStatus()),
+                        nameLike(orderSearch.getMemberName()))
+                .limit(1000)
+                .fetch();
+    }
+
+    private Object nameLike(String nameCond) {
+        if (!StringUtils.hasText(nameCond)) {
+            return null;
+        }
+    }
+
+    private BooleanExpression statusEq(OrderStatus statusCond) {
+        if (statusCond == null) {
+            return null;
+        }
+        return order.status.eq(statusCond);
+    }
 
 }
