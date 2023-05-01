@@ -42,8 +42,8 @@ var main = {
         var id = $('#id').val();
 
         $.ajax({
-            type: 'PUT',
-            url: '/api/v1/posts/'+id,
+            type: 'PUT', // 수정이니까 put
+            url: '/api/v1/posts/'+id, // url path 구분을 ㅜ이해 path에 id추가
             dataType: 'json',
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data)
