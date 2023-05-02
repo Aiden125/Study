@@ -1,5 +1,6 @@
 package com.jojoldu.book.freelecspringboot2webservice.web;
 
+import com.jojoldu.book.freelecspringboot2webservice.config.auth.dto.SessionUser;
 import com.jojoldu.book.freelecspringboot2webservice.service.posts.PostsService;
 import com.jojoldu.book.freelecspringboot2webservice.web.dto.PostsResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -10,16 +11,24 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.servlet.http.HttpSession;
+
 @RequiredArgsConstructor
 @Controller
 public class IndexController {
 
     private final PostsService postsService;
+    private final HttpSession httpSession;
 
     @GetMapping("/")
     public String index(Model model) {
 
         model.addAttribute("posts", postsService.findAllDesc());
+
+        SessionUser user = (SessionUser) httpSession.getAttribute("user");
+        if (user != null) {
+            model.addAttribute("userName", user.getName());
+        }
         return "index"; // mustache 스타터 덕에 확장자 자동지정
     }
 
