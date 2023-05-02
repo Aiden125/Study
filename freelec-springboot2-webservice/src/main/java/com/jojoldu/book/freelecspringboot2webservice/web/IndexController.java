@@ -27,7 +27,7 @@ public class IndexController {
 
         SessionUser user = (SessionUser) httpSession.getAttribute("user");
         if (user != null) {
-            model.addAttribute("userName", user.getName());
+            model.addAttribute("uName", user.getName());
         }
         return "index"; // mustache 스타터 덕에 확장자 자동지정
     }
