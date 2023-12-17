@@ -26,3 +26,11 @@ print(id(n)) ### 2448580218192
 print(id(m) == id(n)) ### False
 print()
 
+# id(identity) 객체 고유값 확인, 같은 값일 경우 같은 주소를 가진다
+a = 800
+b = 800
+print(id(a)) ### 2448627123123
+print(id(b)) ### 2448627123123
+print(id(a) == id(b)) ### True
+print()
+
